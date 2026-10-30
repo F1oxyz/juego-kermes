@@ -42,12 +42,12 @@ export class GameEngine {
   private animTimer = 0;
 
   // Physics constants (gentler, easier, delta-time normalized to 60fps)
-  private readonly GRAVITY = 0.25;
-  private readonly JUMP_STRENGTH = -5.8;
-  private readonly MAX_FALL_SPEED = 6.5;
-  private readonly PIPE_SPEED = 1.65;
-  private readonly PIPE_GAP = 185;
-  private readonly PIPE_SPACING = 260;
+  private readonly GRAVITY = 0.30;
+  private readonly JUMP_STRENGTH = -6.3;
+  private readonly MAX_FALL_SPEED = 7.8;
+  private readonly PIPE_SPEED = 2.05;
+  private readonly PIPE_GAP = 168;
+  private readonly PIPE_SPACING = 235;
 
   // Game state
   private isRunning = false;
