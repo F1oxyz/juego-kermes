@@ -41,17 +41,20 @@ export class GameEngine {
   private animFrame = 0;
   private animTimer = 0;
 
-  // Physics constants
-  private readonly GRAVITY = 0.36;
-  private readonly JUMP_STRENGTH = -7.2;
-  private readonly MAX_FALL_SPEED = 9.5;
-  private readonly PIPE_SPEED = 2.3;
-  private readonly PIPE_GAP = 145;
-  private readonly PIPE_SPACING = 210;
+  // Physics constants (gentler, easier, delta-time normalized to 60fps)
+  private readonly GRAVITY = 0.25;
+  private readonly JUMP_STRENGTH = -5.8;
+  private readonly MAX_FALL_SPEED = 6.5;
+  private readonly PIPE_SPEED = 1.65;
+  private readonly PIPE_GAP = 185;
+  private readonly PIPE_SPACING = 260;
 
   // Game state
   private isRunning = false;
   private isDead = false;
+  private isWaiting = false;
+  private waitTimer = 0;
+  private lastFlapTime = 0;
   private score = 0;
   private pipes: Pipe[] = [];
   private particles: Particle[] = [];
@@ -71,17 +74,33 @@ export class GameEngine {
     this.falconSprites = createFalconSprites(2.6);
   }
 
-  public start() {
+  public prepare() {
+    this.stop();
     this.reset();
     this.isRunning = true;
     this.isDead = false;
+    this.isWaiting = true;
+    this.waitTimer = 0;
     this.lastTime = performance.now();
-    this.loop(this.lastTime);
-    this.flap();
+    this.animationId = requestAnimationFrame(this.loop);
+  }
+
+  public start() {
+    this.prepare();
   }
 
   public flap() {
     if (!this.isRunning || this.isDead) return;
+
+    const now = performance.now();
+    if (now - this.lastFlapTime < 110) return;
+    this.lastFlapTime = now;
+
+    if (this.isWaiting) {
+      this.isWaiting = false;
+      this.lastTime = now;
+    }
+
     this.falconVy = this.JUMP_STRENGTH;
     this.falconRotation = -0.45; // ~ -25 deg
     this.animFrame = 2; // Upstroke wing frame
@@ -112,14 +131,15 @@ export class GameEngine {
     this.pipes = [];
     this.particles = [];
 
-    // Pre-populate initial pipes spaced comfortably
-    const firstPipeX = this.V_WIDTH + 80;
+    // Pre-populate initial pipes spaced comfortably further right
+    const firstPipeX = this.V_WIDTH + 120;
     this.createPipe(firstPipeX);
     this.createPipe(firstPipeX + this.PIPE_SPACING);
   }
 
   public stop() {
     this.isRunning = false;
+    this.isWaiting = false;
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
@@ -143,26 +163,46 @@ export class GameEngine {
   private loop = (currentTime: number) => {
     if (!this.isRunning) return;
 
-    this.update();
+    const dt = this.lastTime > 0 ? Math.min((currentTime - this.lastTime) / 16.667, 2.5) : 1;
+    this.lastTime = currentTime;
+
+    this.update(dt);
     this.render();
 
-    this.lastTime = currentTime;
-    this.animationId = requestAnimationFrame(this.loop);
+    if (this.isRunning) {
+      this.animationId = requestAnimationFrame(this.loop);
+    }
   };
 
-  private update() {
+  private update(dt: number) {
+    if (this.isWaiting) {
+      // Gentle idle hover while waiting for first tap
+      this.waitTimer += dt * 0.08;
+      this.falconY = 260 + Math.sin(this.waitTimer) * 7;
+      this.falconRotation = 0;
+
+      this.animTimer += dt;
+      if (this.animTimer > 7) {
+        this.animTimer = 0;
+        this.animFrame = (this.animFrame + 1) % 3;
+      }
+
+      this.background.update(this.PIPE_SPEED * 0.45 * dt);
+      return;
+    }
+
     // 1. Update falcon physics
-    this.falconVy += this.GRAVITY;
+    this.falconVy += this.GRAVITY * dt;
     if (this.falconVy > this.MAX_FALL_SPEED) {
       this.falconVy = this.MAX_FALL_SPEED;
     }
-    this.falconY += this.falconVy;
+    this.falconY += this.falconVy * dt;
 
     // Smooth rotation: tilt upwards on jump, dive when falling
     if (this.falconVy < 0) {
-      this.falconRotation = Math.max(this.falconRotation - 0.08, -0.45);
+      this.falconRotation = Math.max(this.falconRotation - 0.08 * dt, -0.45);
     } else {
-      this.falconRotation = Math.min(this.falconRotation + 0.045, 1.2); // dives down
+      this.falconRotation = Math.min(this.falconRotation + 0.038 * dt, 1.1); // dives down
     }
 
     // Ceiling bound
@@ -172,7 +212,7 @@ export class GameEngine {
     }
 
     // Wing flap animation frame cycling
-    this.animTimer++;
+    this.animTimer += dt;
     if (this.animTimer > 5) {
       this.animTimer = 0;
       this.animFrame = (this.animFrame + 1) % 3;
@@ -189,12 +229,12 @@ export class GameEngine {
 
     if (!this.isDead) {
       // 3. Move & manage pipes
-      this.background.update(this.PIPE_SPEED);
+      this.background.update(this.PIPE_SPEED * dt);
 
       const pipeWidth = 58;
       for (let i = 0; i < this.pipes.length; i++) {
         const pipe = this.pipes[i];
-        pipe.x -= this.PIPE_SPEED;
+        pipe.x -= this.PIPE_SPEED * dt;
 
         // Check score trigger
         if (!pipe.passed && pipe.x + pipeWidth < this.falconX) {
@@ -223,10 +263,10 @@ export class GameEngine {
     // 4. Update particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life -= 1;
-      p.alpha = p.life / 25;
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.life -= dt;
+      p.alpha = Math.max(0, p.life / 25);
       if (p.life <= 0) {
         this.particles.splice(i, 1);
       }
@@ -237,12 +277,12 @@ export class GameEngine {
     const falconW = this.falconSprites.width;
     const falconH = this.falconSprites.height;
 
-    // Forgiving hitbox (padding 7px on sides, 5px top/bottom)
+    // Forgiving hitbox (padding 8px on sides, 7px top/bottom)
     const hitBox = {
-      x: this.falconX + 6,
-      y: this.falconY + 5,
-      w: falconW - 12,
-      h: falconH - 10,
+      x: this.falconX + 8,
+      y: this.falconY + 7,
+      w: falconW - 16,
+      h: falconH - 14,
     };
 
     // Check top stick
@@ -329,7 +369,51 @@ export class GameEngine {
     // 5. In-game Score Display (Pixel HUD at top center)
     if (this.isRunning && !this.isDead) {
       this.drawScoreHUD(ctx, this.score);
+      if (this.isWaiting) {
+        this.drawWaitingOverlay(ctx);
+      }
     }
+  }
+
+  private drawWaitingOverlay(ctx: CanvasRenderingContext2D) {
+    ctx.save();
+
+    const boxW = 300;
+    const boxH = 115;
+    const boxX = (this.V_WIDTH - boxW) / 2;
+    const boxY = 340;
+
+    // Drop shadow
+    ctx.fillStyle = '#0f0803';
+    ctx.fillRect(boxX + 5, boxY + 5, boxW, boxH);
+
+    // Main card background
+    ctx.fillStyle = 'rgba(43, 20, 6, 0.92)';
+    ctx.fillRect(boxX, boxY, boxW, boxH);
+
+    // Gold pixel border
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+    ctx.textAlign = 'center';
+
+    // Bouncing prompt text
+    const bounceY = Math.sin(this.waitTimer * 1.6) * 3;
+
+    ctx.font = '13px "Press Start 2P", monospace';
+    ctx.fillStyle = '#fef08a';
+    ctx.fillText('👆 TOCA LA PANTALLA', this.V_WIDTH / 2, boxY + 42 + bounceY);
+
+    ctx.font = '11px "Press Start 2P", monospace';
+    ctx.fillStyle = '#4ade80';
+    ctx.fillText('PARA COMENZAR', this.V_WIDTH / 2, boxY + 72 + bounceY);
+
+    ctx.font = '8px "Press Start 2P", monospace';
+    ctx.fillStyle = '#d6d3d1';
+    ctx.fillText('(O PRESIONA ESPACIO)', this.V_WIDTH / 2, boxY + 98);
+
+    ctx.restore();
   }
 
   private drawScoreHUD(ctx: CanvasRenderingContext2D, score: number) {

@@ -4,7 +4,6 @@ import type { Player, ScreenState } from './types/game';
 import { GameEngine } from './game/GameEngine';
 import { RegistrationModal } from './components/RegistrationModal';
 import { GameOverModal } from './components/GameOverModal';
-import { LeaderboardModal } from './components/LeaderboardModal';
 import { getLastPlayer } from './utils/storage';
 import { soundManager } from './utils/audio';
 
@@ -67,13 +66,13 @@ export const App: React.FC = () => {
     setPlayer(chosenPlayer);
     setScreen('PLAYING');
     setCurrentScore(0);
-    // Slight tick to ensure modal has faded
+    // Slight tick to ensure modal has faded, then enter ready/waiting state
     setTimeout(() => {
-      engineRef.current?.start();
+      engineRef.current?.prepare();
     }, 50);
   };
 
-  const handleCanvasClick = (e: React.MouseEvent | React.TouchEvent) => {
+  const handleCanvasClick = (e: React.PointerEvent) => {
     e.preventDefault();
     if (screen === 'PLAYING') {
       engineRef.current?.flap();
@@ -112,27 +111,12 @@ export const App: React.FC = () => {
           >
             {isMuted ? '🔇' : '🔊'}
           </button>
-
-          <button
-            type="button"
-            className="leaderboard-quick-btn"
-            onClick={() => {
-              soundManager.playClick();
-              if (screen === 'PLAYING') {
-                engineRef.current?.stop();
-              }
-              setScreen('LEADERBOARD');
-            }}
-            title="Ver tabla de posiciones"
-          >
-            🏆 RANKING
-          </button>
         </div>
       </header>
 
       {/* Main Game Screen Viewport */}
       <main className="game-viewport">
-        <div className="canvas-wrapper" onMouseDown={handleCanvasClick} onTouchStart={handleCanvasClick}>
+        <div className="canvas-wrapper" onPointerDown={handleCanvasClick}>
           <canvas
             ref={canvasRef}
             width={400}
@@ -152,7 +136,6 @@ export const App: React.FC = () => {
         {screen === 'REGISTER' && (
           <RegistrationModal
             onStartGame={handleStartGame}
-            onViewLeaderboard={() => setScreen('LEADERBOARD')}
           />
         )}
 
@@ -163,32 +146,9 @@ export const App: React.FC = () => {
             player={player}
             onPlayAgain={() => {
               setScreen('PLAYING');
-              engineRef.current?.start();
+              engineRef.current?.prepare();
             }}
             onChangePlayer={() => setScreen('REGISTER')}
-            onViewLeaderboard={() => setScreen('LEADERBOARD')}
-          />
-        )}
-
-        {/* Modal: Leaderboard */}
-        {screen === 'LEADERBOARD' && (
-          <LeaderboardModal
-            onClose={() => {
-              if (player) {
-                setScreen('REGISTER');
-              } else {
-                setScreen('REGISTER');
-              }
-            }}
-            onPlayAgain={() => {
-              if (player) {
-                setScreen('PLAYING');
-                engineRef.current?.start();
-              } else {
-                setScreen('REGISTER');
-              }
-            }}
-            currentPlayerName={player?.name}
           />
         )}
       </main>

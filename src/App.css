@@ -136,6 +136,9 @@
   align-items: center;
   cursor: pointer;
   position: relative;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .game-canvas {
@@ -143,6 +146,9 @@
   height: 100%;
   object-fit: contain;
   background: #3a7bd5;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .touch-helper-layer {

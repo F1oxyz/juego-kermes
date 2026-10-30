@@ -5,13 +5,11 @@ import { soundManager } from '../utils/audio';
 
 interface RegistrationModalProps {
   onStartGame: (player: Player) => void;
-  onViewLeaderboard: () => void;
   initialError?: string;
 }
 
 export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   onStartGame,
-  onViewLeaderboard,
   initialError,
 }) => {
   const [name, setName] = useState('');
@@ -108,19 +106,6 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
             ▶ ¡A VOLAR!
           </button>
         </form>
-
-        <div className="card-actions-alt">
-          <button
-            type="button"
-            className="pixel-btn btn-secondary btn-block"
-            onClick={() => {
-              soundManager.playClick();
-              onViewLeaderboard();
-            }}
-          >
-            📊 VER TABLA DE POSICIONES
-          </button>
-        </div>
       </div>
     </div>
   );

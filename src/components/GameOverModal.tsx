@@ -10,7 +10,6 @@ interface GameOverModalProps {
   player: Player;
   onPlayAgain: () => void;
   onChangePlayer: () => void;
-  onViewLeaderboard: () => void;
 }
 
 export const GameOverModal: React.FC<GameOverModalProps> = ({
@@ -18,7 +17,6 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   player,
   onPlayAgain,
   onChangePlayer,
-  onViewLeaderboard,
 }) => {
   const [selectedCoupon, setSelectedCoupon] = useState<CouponType>('popcorn');
 
@@ -132,17 +130,6 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
             }}
           >
             🔄 JUGAR DE NUEVO
-          </button>
-
-          <button
-            type="button"
-            className="pixel-btn btn-secondary"
-            onClick={() => {
-              soundManager.playClick();
-              onViewLeaderboard();
-            }}
-          >
-            🏆 LEADERBOARD
           </button>
 
           <button
