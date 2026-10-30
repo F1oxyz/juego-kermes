@@ -1,0 +1,46 @@
+/* Global Pixel Art Reset & Base Styling */
+:root {
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-pixel-sub: 'Silkscreen', monospace;
+  --color-oaxaca-terra: #c25e2e;
+  --color-oaxaca-sky: #4f8fcb;
+  --color-oaxaca-green: #3d6a45;
+  --color-oaxaca-gold: #f59e0b;
+  --color-wood-dark: #3b1d08;
+  --color-wood-mid: #6b3819;
+  --color-pixel-black: #17110e;
+  --color-pixel-white: #fffdf5;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #120e0c;
+  background-image: 
+    radial-gradient(#261914 15%, transparent 16%),
+    radial-gradient(#1e130f 15%, transparent 16%);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+  color: var(--color-pixel-white);
+  font-family: var(--font-pixel-sub), monospace;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
