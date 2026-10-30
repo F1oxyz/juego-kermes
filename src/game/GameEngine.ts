@@ -432,7 +432,7 @@ export class GameEngine {
     ctx.fillText(text, x + 2, y - 2);
 
     // Glowing main score
-    ctx.fillStyle = score >= 11 ? '#4ade80' : score >= 5 ? '#facc15' : '#ffffff';
+    ctx.fillStyle = score >= 20 ? '#4ade80' : score >= 5 ? '#facc15' : '#ffffff';
     ctx.fillText(text, x, y);
 
     // Subtle helper badge
@@ -440,8 +440,8 @@ export class GameEngine {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
     if (score < 5) {
       ctx.fillText(`FALTAN ${5 - score} PTS PARA CUPÓN`, x, y + 28);
-    } else if (score <= 10) {
-      ctx.fillText(`¡CUPÓN GANADO! (+${11 - score} PARA AMBOS)`, x, y + 28);
+    } else if (score < 20) {
+      ctx.fillText(`¡CUPÓN GANADO! (+${20 - score} PARA AMBOS)`, x, y + 28);
     } else {
       ctx.fillStyle = '#86efac';
       ctx.fillText('¡¡AMBOS CUPONES GANADOS!!', x, y + 28);

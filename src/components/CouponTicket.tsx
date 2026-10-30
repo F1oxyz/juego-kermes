@@ -48,6 +48,9 @@ export const CouponTicket: React.FC<CouponTicketProps> = ({ type, player, score 
           <div className="ticket-product">
             {isPopcorn ? 'DE DESCUENTO EN PALOMITAS' : 'DE DESCUENTO EN PAN'}
           </div>
+          <div className="ticket-non-cumulative">
+            ⚠️ NO ACUMULABLE • 1 SOLO USO
+          </div>
           <div className="ticket-meta">
             <p><strong>ALUMNO:</strong> {player.name.toUpperCase()}</p>
             <p><strong>GRUPO:</strong> {player.group.toUpperCase()}</p>
@@ -77,7 +80,7 @@ export const CouponTicket: React.FC<CouponTicketProps> = ({ type, player, score 
           </button>
         </div>
       </div>
-      <div className="ticket-watermark">VÁLIDO SOLO EN KERMÉS</div>
+      <div className="ticket-watermark">⚠️ CUPÓN NO ACUMULABLE • VÁLIDO POR 1 SOLO PRODUCTO</div>
     </div>
   );
 };

@@ -343,6 +343,13 @@
   margin-top: 4px;
 }
 
+.prize-warning {
+  color: #b91c1c;
+  font-weight: bold;
+  margin-top: 4px;
+  font-size: 9px;
+}
+
 /* Buttons */
 .pixel-btn {
   font-family: var(--font-pixel);
@@ -480,6 +487,29 @@
   font-size: 11px;
   color: #4b5563;
   margin-bottom: 12px;
+}
+
+.non-cumulative-pill {
+  display: inline-block;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 2px solid #dc2626;
+  padding: 3px 8px;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.coupon-locked-notice {
+  background: #ecfdf5;
+  border: 2px solid #059669;
+  color: #065f46;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  padding: 8px;
+  margin-bottom: 10px;
+  line-height: 1.4;
 }
 
 .fail-tip-box {
@@ -650,7 +680,18 @@
   font-family: var(--font-pixel);
   font-size: 8px;
   color: #78350f;
-  margin: 2px 0 6px 0;
+  margin: 2px 0 4px 0;
+}
+
+.ticket-non-cumulative {
+  display: inline-block;
+  font-family: var(--font-pixel);
+  font-size: 6.5px;
+  background: #dc2626;
+  color: #ffffff;
+  padding: 2px 5px;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
 }
 
 .ticket-meta p {
@@ -688,9 +729,12 @@
   font-size: 7px;
   font-family: var(--font-pixel);
   text-align: center;
-  color: #9ca3af;
-  margin-top: 6px;
-  letter-spacing: 1px;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px dashed #ef4444;
+  padding: 4px 6px;
+  margin-top: 8px;
+  letter-spacing: 0.5px;
 }
 
 /* Modal Actions Grid */

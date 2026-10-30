@@ -98,8 +98,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           {error && <div className="pixel-alert alert-danger">{error}</div>}
 
           <div className="prizes-hint">
-            <p className="prize-line">🎯 <strong>5 a 10 pts:</strong> Cupón $5 (Palomitas o Pan)</p>
-            <p className="prize-line prize-gold">⭐ <strong>Más de 10 pts:</strong> ¡AMBOS CUPONES!</p>
+            <p className="prize-line">🎯 <strong>5 a 19 pts:</strong> 1 Cupón $5 (Palomitas o Pan)</p>
+            <p className="prize-line prize-gold">⭐ <strong>20 pts o más:</strong> ¡AMBOS CUPONES!</p>
+            <p className="prize-line prize-warning">⚠️ <strong>Importante:</strong> Cupones NO acumulables.</p>
           </div>
 
           <button type="submit" className="pixel-btn btn-primary btn-block pulse-btn">
